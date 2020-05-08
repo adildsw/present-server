@@ -1,0 +1,90 @@
+<!-- Manage Departments Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="building outline icon"></i>
+    <div class="content">
+      Manage Departments
+    </div>
+  </h2>
+
+  <table class="ui compact selectable striped celled table">
+
+    <!-- Department Table Head -->
+    {% if dept_name|length > 0 %}
+    <thead>
+      <tr>
+        <th class="eleven wide">Department Name</th>
+        <th class="three wide center aligned">Department Code</th>
+        <th class="center aligned">Modify</th>
+        <th class="center aligned">Delete</th>
+      </tr>
+    </thead>
+    {% endif %}
+
+    <!-- Department Table Body -->
+    <tbody>
+      {% for i in range(dept_name|length) %}
+      <tr>
+        <td>{{dept_name[i]}}</td>
+        <td class="center aligned">{{dept_code[i]}}</td>
+        <td class="center aligned">
+          <button class="ui button small teal">Modify</button>
+        </td>
+        <td class="center aligned">
+          <button class="ui button small red">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+    <!-- Add Department Panel -->
+    <tfoot class="full-width">
+      <tr>
+        <th colspan="4">
+          <div class="ui form">
+            <div class="inline fields">
+
+              <div class="seven wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Department Name
+                  </div>
+                  <input type="text" name="dept-name" placeholder="Name">
+                </div>
+              </div>
+              <div class="four wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Department Code
+                  </div>
+                  <input type="text" name="dept-code" placeholder="Code">
+                </div>
+              </div>
+              <div class="two wide field">
+                <button class="ui fluid small primary labeled icon button" id="btnAddDept">
+                  Add Dept.
+                  <i class="plus circle icon"></i>
+                </button>
+              </div>
+              <div class="three wide field">
+                 <div class="ui fluid buttons fluid">
+                  <button class="ui small green labeled icon button" id="btnAddDeptCSV">
+                    Add from CSV
+                    <i class="table icon"></i>
+                    <input type="file" class="invisible" id="selectDeptCSV" accept=".csv">
+                  </button>
+                  <div class="or" data-text="I"></div>
+                  <button class="ui orange icon compact button" id="btnAddDeptCSVSample" data-position="bottom right" data-content="Download sample CSV for adding departments.">
+                    <i class="download icon"></i>
+                  </button>
+                </div>
+              </div>
+            </div> <!-- .inline -->
+          </div> <!-- .form -->
+        </th>
+      </tr>
+    </tfoot>
+
+  </table>
+
+</div>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>present.</title>
+
+  <link rel="shortcut icon" href="images/present-icon.png">
+  <link rel="stylesheet" href="css/semantic.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/semantic.min.js"></script>
+  <script src="js/helper.js"></script>
+  <script src="js/connection.js"></script>
+</head>
+<body>
+
+  <div class="ui center aligned stackable grid vertical-center ">
+    <div class="ui five wide column segment">
+      <div class="ui medium image">
+        <img src="images/logo-dark.png" alt="logo">
+      </div>
+
+      <!-- Database Setup Form -->
+      {% if server_code==0 %}
+        <div class="ui horizontal fluid divider">
+          Database Setup
+        </div>
+        <div class="ui form">
+          <div class="field">
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                IP
+              </div>
+              <input type="text" name="db-host-ip" placeholder="127.0.0.1">
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                Port
+              </div>
+              <input type="text" name="db-host-port" placeholder="27017">
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                Username
+              </div>
+              <input type="text" name="db-username" placeholder="Username">
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                Password
+              </div>
+              <input type="password" name="db-password" placeholder="Password">
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                Auth Database
+              </div>
+              <input type="text" name="db-auth" placeholder="admin">
+            </div>
+          </div>
+          <button class="ui right labeled icon orange button" id="btnConnectDB">
+            <span>Connect</span>
+            <i class="arrow circle right icon"></i>
+          </button>
+        </div>
+
+      <!-- Server Setup Form -->
+      {% elif server_code==1 %}
+        <div class="ui horizontal fluid divider">
+          Server Setup
+        </div>
+        <div class="ui form">
+          <div class="field">
+            <label>Organization Details</label>
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                Name
+              </div>
+              <input type="text" name="org-name" placeholder="Organization Name">
+            </div>
+          </div>
+          <div class="field">
+            <label>Administrator Authentication</label>
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                Password
+              </div>
+              <input type="password" name="reg-pwd" placeholder="Administrator Password">
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui labeled fluid input">
+              <div class="ui label">
+                Confirm &nbsp;&nbsp;
+              </div>
+              <input type="password" name="reg-cnf-pwd" placeholder="Confirm Admin Password">
+            </div>
+          </div>
+          <button class="ui right labeled icon orange button" id="btnGetStarted">
+            Get Started
+            <i class="arrow circle right icon"></i>
+          </button>
+        </div>
+
+      <!-- Login Form -->
+      {% elif server_code==2 %}
+        <div class="">
+          <div class="ui horizontal fluid divider">
+            {{ org_name }}
+          </div>
+          <div class="ui top attached tabular menu">
+            <a class="active item" data-tab="user-tab">Faculty</a>
+            <a class="item" data-tab="admin-tab">Administrator</a>
+          </div>
+          <div class="ui bottom attached active tab segment" data-tab="user-tab">
+            <div class="ui form">
+              <div class="field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Username
+                  </div>
+                  <input type="text" name="faculty_login_username" placeholder="Username">
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Password
+                  </div>
+                  <input type="password" name="faculty_login_pwd" placeholder="Password">
+                </div>
+              </div>
+              <button class="ui right labeled icon orange button" id="faculty_login_bt">
+                Log In
+                <i class="sign-in icon"></i>
+              </button>
+            </div>
+          </div>
+          <div class="ui bottom attached tab segment" data-tab="admin-tab">
+            <div class="ui form">
+              <div class="field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Password
+                  </div>
+                  <input type="password" name="admin-pwd" placeholder="Password">
+                </div>
+              </div>
+              <button class="ui right labeled icon orange button"  id="btnLoginAdmin">
+                Log In
+                <i class="sign-in icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      <!-- Retry DB Connection Form -->
+      {% elif server_code==3 %}
+        <div class="ui horizontal fluid divider">
+          Database Connection Issue
+        </div>
+        <div class="ui form">
+          <button class="ui right labeled icon orange button" id="btnRetry">
+            Retry
+            <i class="redo alternative icon"></i>
+          </button>
+          <button class="ui right labeled icon teal button" id="btnReconfig">
+            <!-- TODO: Adding a confirmation before reconfiguring. -->
+            Reconfigure DB
+            <i class="cog icon"></i>
+          </button>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</body>
+</html>

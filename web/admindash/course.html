@@ -1,0 +1,140 @@
+<!-- Manage Courses Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="language icon"></i>
+    <div class="content">
+      Manage Courses
+    </div>
+  </h2>
+
+  <table class="ui compact selectable striped celled table">
+
+    <!-- Course Table Head -->
+    {% if course_code|length > 0 %}
+    <thead>
+      <tr>
+        <th class="two wide">Course Code</th>
+        <th class="five wide">Course Name</th>
+        <th class="two wide">Faculty Code(s)</th>
+        <th class="three wide">Participating Class(es)</th>
+        <th class="one wide center aligned">Status</th>
+        <th class="center aligned">Details</th>
+        <th class="center aligned">Modify</th>
+        <th class="center aligned">Delete</th>
+      </tr>
+    </thead>
+    {% endif %}
+
+    <!-- Course Table Body -->
+    <tbody>
+      {% for i in range(course_code|length) %}
+      <tr>
+        <td>{{course_code[i]}}</td>
+        <td>{{course_name[i]}}</td>
+        <td>{{course_faculty_code[i]}}</td>
+        <td>{{course_class_code[i]}}</td>
+        <td class="center aligned">{{course_status[i]}}</td>
+        <td class="center aligned">
+          <button class="ui button small violet">View</button>
+        </td>
+        <td class="center aligned">
+          <button class="ui button small teal">Modify</button>
+        </td>
+        <td class="center aligned">
+          <button class="ui button small red">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+    <!-- Add Course Panel -->
+    <tfoot class="full-width">
+      <tr rowspan="2">
+        <th colspan="8">
+          <div class="ui form">
+
+            <!-- First Courses Form Line -->
+            <div class="inline fields">
+
+              <div class="four wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Course Code
+                  </div>
+                  <input type="text" name="course_code" placeholder="Course Code">
+                </div>
+              </div>
+              <div class="six wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Course Name
+                  </div>
+                  <input type="text" name="course_name" placeholder="Course name">
+                </div>
+              </div>
+              <div class="six wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Faculty Code(s)
+                  </div>
+                  <div  class="ui fluid selection dropdown multiple upward">
+                    <input type="hidden" name="course_faculty_code">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Faculty Code(s)</div>
+                    <div class="menu">
+                      {% for i in range(faculty_code|length) %}
+                      <div class="item" data-value="{{faculty_code[i]}}">{{faculty_code[i]}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- .inline -->
+
+            <!-- Second Courses Form Line -->
+            <div class="inline fields">
+              <div class="eleven wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Participating Class(es)
+                  </div>
+                  <div  class="ui fluid selection dropdown multiple upward">
+                    <input type="hidden" name="course_class_code">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Participating Class(es)</div>
+                    <div class="menu">
+                      {% for i in range(class_code|length) %}
+                      <div class="item" data-value="{{class_code[i]}}">{{class_code[i]}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="two wide field">
+                <button class="ui fluid small primary labeled icon button" id="add_course_bt">
+                  Add Course
+                  <i class="plus circle icon"></i>
+                </button>
+              </div>
+              <div class="three wide field">
+                <div class="ui fluid buttons fluid">
+                  <button class="ui small green labeled icon button" id="add_course_csv_bt">
+                    Add from CSV
+                    <i class="table icon"></i>
+                    <input type="file" class="invisible" id="add_course_csv_file" accept=".csv">
+                  </button>
+                  <div class="or" data-text="I"></div>
+                  <button class="ui orange icon compact button" id="add_course_csv_sample_bt" data-position="bottom right" data-content="Download sample CSV for adding courses. Note: separate multi-valued entries in the csv file using '|' (pipe) character.">
+                    <i class="download icon"></i>
+                  </button>
+                </div>
+              </div>
+            </div> <!-- .inline -->
+          </div> <!-- .form -->
+        </th>
+      </tr>
+    </tfoot>
+
+  </table>
+
+</div>

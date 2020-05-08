@@ -1,0 +1,150 @@
+<!-- Manage Class Groups Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="window restore outline icon"></i>
+    <div class="content">
+      Manage Class Groups
+    </div>
+  </h2>
+
+  <table class="ui compact selectable striped celled table">
+
+    <!-- Class Group Table Head -->
+    {% if class_code|length > 0 %}
+    <thead>
+      <tr>
+        <th class="two wide">Class Group Code</th>
+        <th class="four wide">Department Name</th>
+        <th class="two wide center aligned">Start Year</th>
+        <th class="two wide center aligned">Graduating Year</th>
+        <th class="center aligned">Section</th>
+        <th class="center aligned">Students</th>
+        <th class="center aligned">Manage</th>
+        <th class="center aligned">Modify</th>
+        <th class="center aligned">Delete</th>
+      </tr>
+    </thead>
+    {% endif %}
+
+    <!-- Class Group Table Body -->
+    <tbody>
+      {% for i in range(0, class_code|length) %}
+      <tr>
+        <td>{{class_code[i]}}</td>
+        <td>{{dept_name[i]}}</td>
+        <td class="center aligned">{{class_start[i]}}</td>
+        <td class="center aligned">{{class_end[i]}}</td>
+        <td class="center aligned">{{class_section[i]}}</td>
+        <td class="center aligned">{{student_count[i]}}</td>
+        <td class="center aligned">
+          <button class="ui button small violet">Manage</button>
+        </td>
+        <td class="center aligned">
+          <button class="ui button small teal">Modify</button>
+        </td>
+        <td class="center aligned">
+          <button class="ui button small red">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+    <!-- Add Class Group Panel -->
+    <tfoot class="full-width">
+      <tr>
+        <th colspan="9">
+          <div class="ui form">
+            <div class="inline fields">
+
+              <div class="five wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Department
+                  </div>
+                  <div class="ui fluid selection dropdown upward">
+                    <input type="hidden" name="class_dept">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Department</div>
+                    <div class="menu">
+                      {% for i in range(dept_name_list|length) %}
+                      <div class="item" data-value="{{dept_name_list[i]}}">{{dept_name_list[i]}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="four wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Class Of
+                  </div>
+                  <div class="ui fluid selection dropdown upward">
+                    <input type="hidden" name="class_start_year">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Start Year</div>
+                    <div class="menu">
+                      {% for i in range(2000, 2030) %}
+                      <div class="item" data-value="{{i}}">{{i}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="ui fluid selection dropdown upward">
+                    <input type="hidden" name="class_graduating_year">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Grad. Year</div>
+                    <div class="menu">
+                      {% for i in range(2000, 2030) %}
+                      <div class="item" data-value="{{i}}">{{i}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="two wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Section
+                  </div>
+                  <div class="ui fluid selection dropdown upward">
+                    <input type="hidden" name="class_section" value="-">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Section</div>
+                    <div class="menu">
+                      {% for i in range(section|length) %}
+                      <div class="item" data-value="{{section[i]}}">{{section[i]}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="two wide field">
+                <button class="ui fluid small primary labeled icon button" id="add_class_bt">
+                  Add Class
+                  <i class="plus circle icon"></i>
+                </button>
+              </div>
+              <div class="three wide field">
+                 <div class="ui fluid buttons fluid">
+                  <button class="ui small green labeled icon button" id="add_class_csv_bt">
+                    Add from CSV
+                    <i class="table icon"></i>
+                    <input type="file" class="invisible" id="add_class_csv_file" accept=".csv">
+                  </button>
+                  <div class="or" data-text="I"></div>
+                  <button class="ui orange icon compact button" id="add_class_csv_sample_bt" data-position="bottom right" data-content="Download sample CSV for adding class groups.">
+                    <i class="download icon"></i>
+                  </button>
+                </div>
+              </div>
+            </div> <!-- .inline -->
+          </div> <!-- .form -->
+        </th>
+      </tr>
+    </tfoot>
+
+  </table>
+
+</div>

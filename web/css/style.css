@@ -1,0 +1,13 @@
+.vertical-center {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.invisible {
+  display: none;
+}
+
+.left-aligned-container {
+  float: left;
+}

@@ -1,0 +1,122 @@
+<!-- Manage Students Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="address card outline icon"></i>
+    <div class="content">
+      Manage Students
+    </div>
+  </h2>
+
+  <table class="ui compact selectable striped celled table">
+
+    <!-- Student Table Head -->
+    {% if student_name|length > 0 %}
+    <thead>
+      <tr>
+        <th class="three wide">Student Roll</th>
+        <th class="six wide">Student Name</th>
+        <th class="three wide">Class Code</th>
+        <th class="two wide center aligned">Device Status</th>
+        <th class="center aligned">Unlink Device</th>
+        <th class="center aligned">Modify</th>
+        <th class="center aligned">Delete</th>
+      </tr>
+    </thead>
+    {% endif %}
+
+    <!-- Student Table Body -->
+    <tbody>
+      {% for i in range(student_name|length) %}
+      <tr>
+        <td>{{student_roll[i]}}</td>
+        <td>{{student_name[i]}}</td>
+        <td>{{student_class_code[i]}}</td>
+        <td class="center aligned">{{device_status[i]}}</td>
+        <td class="center aligned">
+          {% if device_status[i] == "Registered" %}
+          <button class="ui button small black unlink_bt" value="{{student_roll[i]}}">Unlink</button>
+          {% else %}
+          <button class="ui button small grey disabled">Unlink</button>
+          {% endif %}
+        </td>
+        <td class="center aligned">
+          <button class="ui button small teal">Modify</button>
+        </td>
+        <td class="center aligned">
+          <button class="ui button small red">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+    <!-- Add Student Panel -->
+    <tfoot class="full-width">
+      <tr>
+        <th colspan="7">
+          <div class="ui form">
+            <div class="inline fields">
+
+              <div class="three wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Student Roll
+                  </div>
+                  <input type="text" name="student_roll" placeholder="Student Roll">
+                </div>
+              </div>
+
+              <div class="four wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Student Name
+                  </div>
+                  <input type="text" name="student_name" placeholder="Student Name">
+                </div>
+              </div>
+
+              <div class="four wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Class Code
+                  </div>
+                  <div class="ui fluid selection dropdown upward">
+                    <input type="hidden" name="student_class_code">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Class Code</div>
+                    <div class="menu">
+                      {% for i in range(class_code|length) %}
+                      <div class="item" data-value="{{class_code[i]}}">{{class_code[i]}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="two wide field">
+                <button class="ui fluid small primary labeled icon button" id="add_student_bt">
+                  Add Student
+                  <i class="plus circle icon"></i>
+                </button>
+              </div>
+              <div class="three wide field">
+                 <div class="ui fluid buttons fluid">
+                  <button class="ui small green labeled icon button" id="add_student_csv_btn">
+                    Add from CSV
+                    <i class="table icon"></i>
+                    <input type="file" class="invisible" id="add_student_csv_file" accept=".csv">
+                  </button>
+                  <div class="or" data-text="I"></div>
+                  <button class="ui orange icon compact button" id="add_student_csv_sample_bt" data-position="bottom right" data-content="Download sample CSV for adding students.">
+                    <i class="download icon"></i>
+                  </button>
+                </div>
+              </div>
+            </div> <!-- .inline -->
+          </div> <!-- .form -->
+        </th>
+      </tr>
+    </tfoot>
+
+  </table>
+
+</div>

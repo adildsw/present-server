@@ -1,0 +1,154 @@
+<!-- Sessions Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="clock outline outline icon"></i>
+    <div class="content">
+      Session Attendance
+    </div>
+  </h2>
+
+  <input type="hidden" name="session_code" value="{{session_code}}">
+  <input type="hidden" name="qr_timestamp" value="">
+
+  <div class="ui grid">
+
+    <!-- Session Details and Attendance Control Panels -->
+    <div class="four wide column" style="display: flex; flex-flow: column; align-items: stretch;">
+      <div class="ui card fluid" style="flex: auto;">
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Session Details
+          </div>
+        </div>
+        <div class="content" style="flex: auto;">
+          <h4 class="ui sub header">Course Info</h4>
+          <div class="description">
+            {{ course_code }} | {{course_name }}
+          </div>
+        </div>
+        <div class="content" style="flex: auto;">
+          <h4 class="ui sub header">Participating Class(es)</h4>
+          <div class="description" id="class_code_div">
+            {{ class_code }}
+          </div>
+        </div>
+        <div class="content" style="flex: auto;">
+          <h4 class="ui sub header">Faculty Code</h4>
+          <div class="description">
+            {{ faculty_code }}
+          </div>
+        </div>
+        <div class="content" style="flex: auto;">
+          <h4 class="ui sub header">Date</h4>
+          <div class="description">
+            {{ date }}
+          </div>
+        </div>
+        <div class="ui bottom attached red button" id="close_attendance_session_bt">
+          <i class="close icon"></i>
+          Close Attendance Session
+        </div>
+      </div>
+
+      <div class="ui card fluid" style="flex: initial;">
+        <div class="content">
+          <div class="header">
+            Attendance Controls
+          </div>
+        </div>
+        <div class="content">
+          <div id="control_share_div">
+            <h4 class="ui sub header">Control Shared With</h4>
+            <div class="description" id="control_share_desc">
+              None
+            </div>
+          </div>
+        </div>
+        <div class="ui labeled fluid input">
+          <div class="ui label">
+            Student Roll
+          </div>
+          <input type="text" name="student_roll" placeholder="Student Roll">
+        </div>
+        <div class="ui bottom attached green button" id="share_control_bt">
+          <i class="share alternate icon"></i>
+          Share Attendance Control
+        </div>
+      </div> <!-- .card -->
+    </div> <!-- .four .wide .column -->
+
+    <!-- Attending Students Panels -->
+    <div class="five wide column center aligned" style="display: flex; flex-flow: column; align-items: stretch;">
+
+      <div class="ui card fluid" style="flex: auto;">
+
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Attending Students
+          </div>
+        </div>
+
+        <div class="content" style="flex: initial;">
+          <div id="attending_students_stats">
+            <div class="ui statistic">
+              <div class="value">
+                <i class="user outline icon"></i>
+                0
+              </div>
+              <div class="label">
+                Student(s) Attending
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content" style="flex: initial; margin-bottom: -2%;">
+          <table class="ui compact selectable striped table">
+            <thead>
+              <tr>
+                <th class="center aligned">Student Roll</th>
+                <th class="center aligned">Student Name</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+
+        <div class="content" style="position: relative; border: 0px; flex: auto;">
+          <div id="attending_students_table_body" style="position: absolute; top: 0; bottom: 0; left: 2%; right: 2%; overflow: auto;">
+            <table class="ui compact selectable striped celled table">
+              <tbody>
+                <tr>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="ui labeled fluid input">
+          <div class="ui label">
+            Student Roll
+          </div>
+          <input type="text" name="attendance_student_roll" placeholder="Student Roll">
+        </div>
+
+        <div class="ui bottom attached blue button" id="give_attendance_bt">
+          <i class="check square icon"></i>
+          Give Attendance
+        </div>
+
+      </div> <!-- .card -->
+
+    </div> <!-- .six .wide .column -->
+
+    <!-- QRCode Panel -->
+    <div class="seven wide column">
+      <div id="qr_code_div">
+        <img class="ui fluid image centered" id="qrcode_img" src="images/present-icon.png">
+      </div>
+    </div>
+
+  </div>
+
+</div>

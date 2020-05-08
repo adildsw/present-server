@@ -1,0 +1,17 @@
+<table class="ui compact selectable striped table">
+  <tbody>
+    {% if student_roll|length == 0 %}
+    <tr>
+      <td class="center aligned">-</td>
+      <td class="center aligned">-</td>
+    </tr
+    {% else %}
+    {% for i in range(student_roll|length - 1, -1, -1) %}
+    <tr>
+      <td class="eight wide center aligned">{{student_roll[i]}}</td>
+      <td class="eight wide center aligned">{{student_name[i]}}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+  </tbody>
+</table>

@@ -1,0 +1,131 @@
+<!-- Manage Faculties Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="user outline icon"></i>
+    <div class="content">
+      Manage Faculties
+    </div>
+  </h2>
+
+  <table class="ui compact selectable striped celled table">
+
+    <!-- Faculty Table Head -->
+    {% if faculty_name|length > 0 %}
+    <thead>
+      <tr>
+        <th class="six wide">Faculty Name</th>
+        <th class="two wide center aligned">Faculty Code</th>
+        <th class="six wide">Department</th>
+        <th class="center aligned">Modify</th>
+        <th class="center aligned">Delete</th>
+      </tr>
+    </thead>
+    {% endif %}
+
+    <!-- Faculty Table Body -->
+    <tbody>
+      {% for i in range(faculty_name|length) %}
+      <tr>
+        <td>{{faculty_name[i]}}</td>
+        <td class="center aligned">{{faculty_code[i]}}</td>
+        <td>{{faculty_dept[i]}}</td>
+        <td class="center aligned">
+          <button class="ui button small teal">Modify</button>
+        </td>
+        <td class="center aligned">
+          <button class="ui button small red">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+    <!-- Add Faculty Panel -->
+    <tfoot class="full-width">
+      <tr rowspan="2">
+        <th colspan="5">
+          <div class="ui form">
+
+            <!-- First Faculty Form Line -->
+            <div class="inline fields">
+
+              <div class="seven wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Faculty Name
+                  </div>
+                  <input type="text" name="faculty_name" placeholder="Faculty Name">
+                </div>
+              </div>
+              <div class="four wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Faculty Code
+                  </div>
+                  <input type="text" name="faculty_code" placeholder="Faculty Code">
+                </div>
+              </div>
+              <div class="five wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Department
+                  </div>
+                  <div class="ui fluid selection dropdown upward">
+                    <input type="hidden" name="faculty_dept">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Department</div>
+                    <div class="menu">
+                      {% for i in range(dept_name|length) %}
+                      <div class="item" data-value="{{dept_name[i]}}">{{dept_name[i]}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- .inline -->
+
+            <!-- Second Faculty Form Line -->
+            <div class="inline fields">
+              <div class="five wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Password
+                  </div>
+                  <input type="password" name="faculty_pwd" placeholder="Password">
+                </div>
+              </div>
+              <div class="five wide field">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">
+                    Confirm Password
+                  </div>
+                  <input type="password" name="faculty_pwd_cnf" placeholder="Confirm Password">
+                </div>
+              </div>
+              <div class="three wide field">
+                <button class="ui fluid small primary labeled icon button" id="add_faculty_bt">
+                  Add Faculty
+                  <i class="plus circle icon"></i>
+                </button>
+              </div>
+              <div class="three wide field">
+                <div class="ui fluid buttons fluid">
+                  <button class="ui small green labeled icon button" id="add_faculty_csv_bt">
+                    Add from CSV
+                    <i class="table icon"></i>
+                    <input type="file" class="invisible" id="add_faculty_csv_file" accept=".csv">
+                  </button>
+                  <div class="or" data-text="I"></div>
+                  <button class="ui orange icon compact button" id="add_faculty_csv_sample_bt" data-position="bottom right" data-content="Download sample CSV for adding departments.">
+                    <i class="download icon"></i>
+                  </button>
+                </div>
+              </div>
+            </div> <!-- .inline -->
+          </div> <!-- .form -->
+        </th>
+      </tr>
+
+
+    </tfoot>
+  </table>
+</div>

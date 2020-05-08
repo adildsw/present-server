@@ -1,0 +1,46 @@
+<!-- Courses Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="language icon"></i>
+    <div class="content">
+      Courses
+    </div>
+  </h2>
+
+  <table class="ui compact selectable striped celled table">
+
+    <!-- Course Table Head -->
+    {% if course_code|length > 0 %}
+    <thead>
+      <tr>
+        <th class="two wide">Course Code</th>
+        <th class="five wide">Course Name</th>
+        <th class="two wide">Faculty Code(s)</th>
+        <th class="three wide">Participating Class(es)</th>
+        <th class="one wide center aligned">Status</th>
+        <th class="center aligned">Sessions</th>
+        <th class="center aligned"></th>
+      </tr>
+    </thead>
+    {% endif %}
+
+    <!-- Course Table Body -->
+    <tbody>
+      {% for i in range(course_code|length) %}
+      <tr>
+        <td>{{course_code[i]}}</td>
+        <td>{{course_name[i]}}</td>
+        <td>{{faculty_code[i]}}</td>
+        <td>{{class_code[i]}}</td>
+        <td class="center aligned">{{course_status[i]}}</td>
+        <td class="center aligned">{{ session_count[i] }}</td>
+        <td class="center aligned">
+          <button class="ui button small primary session_bt" value='{{course_info[i]}}'>Start Session</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+
+</div>
