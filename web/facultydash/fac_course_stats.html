@@ -1,0 +1,206 @@
+<!-- Course Statistics Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="chart bar outline icon"></i>
+    <div class="content">
+      Course Statistics
+    </div>
+  </h2>
+
+  <input type="hidden" name="selected_course_info_stats" value="{{selected_course_info}}">
+
+  <!-- Course Selection Panel -->
+  <div class="ui grid" style="height:80vh;">
+
+    <div class="six wide column" style="display: flex; flex-flow: column; align-items: stretch;">
+
+      <div class="ui card fluid" style="flex: auto;">
+
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Select Course
+          </div>
+        </div>
+
+        <!-- Course Selection Dropdown -->
+        <div class="content" style="flex: auto;">
+          <div class="ui form">
+
+            <div class="field">
+              <div class="ui labeled fluid input">
+                <div class="ui label">
+                  Course
+                </div>
+                <div class="ui fluid selection dropdown upward">
+                  <input type="hidden" name="course_statistics_course_code" id="course_statistics_course_code">
+                  <i class="dropdown icon"></i>
+                  <div class="default text">
+                    Course
+                  </div>
+                  <div class="menu">
+                    {% for i in range(course_info|length) %}
+                    {% if course_info[i] == selected_course_info %}
+                      <div class="item" data-value="">{{course_desc[i]}}</div>
+                    {% else %}
+                      <div class="item" data-value="{{course_info[i]}}">{{course_desc[i]}}</div>
+                    {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- .form -->
+        </div> <!-- .content -->
+
+        <!-- Course Time Frame Input -->
+        <div class="content" style="flex: auto;">
+          <h4 class="ui sub header">Filter Results by Date</h4>
+          <div class="description">
+
+          </div>
+
+          <div class="ui form">
+
+            <div class="field">
+              <div class="ui labeled fluid input">
+                <div class="ui label">
+                  From
+                </div>
+                <input type="text" name="from_date" placeholder="DD/MM/YYYY" value="{{from_date_val}}">
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="ui labeled fluid input">
+                <div class="ui label">
+                  To
+                </div>
+                <input type="text" name="to_date" placeholder="DD/MM/YYYY" value="{{to_date_val}}">
+              </div>
+            </div>
+
+            <div class="field">
+              <button class="ui fluid small teal labeled icon button" id="filter_results_bt">
+                Filter Results
+                <i class="plus circle icon"></i>
+              </button>
+             </div>
+
+          </div> <!-- .form -->
+        </div> <!-- .content -->
+
+        <div class="content" style="flex: auto;">
+          <h4 class="ui sub header">Overall Statistics</h4>
+          <br>
+          <div class="ui two large statistics" style="flex: auto;">
+
+            <div class="statistic">
+              <div class="value">
+                <i class="clock outline icon"></i>
+                {{session_len}}
+              </div>
+              <div class="label">
+                Sessions Taken
+              </div>
+            </div>
+
+            <div class="statistic">
+              <div class="value">
+                <i class="user circle icon"></i>
+                {{student_len}}
+              </div>
+              <div class="label">
+                Total Students
+              </div>
+            </div>
+
+          </div>
+        </div> <!-- .content -->
+
+      </div> <!-- .card -->
+
+    </div> <!-- .five .wide .column -->
+
+    <!-- Course Statistics Panel -->
+    <div class="six wide column" style="display: flex; flex-flow: column; align-items: stretch;">
+      <div class="ui card fluid" style="flex: auto;">
+
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Student Statistics
+          </div>
+        </div>
+
+        <!-- Students Table -->
+        <div class="content" style="position: relative; border: 0px; flex: auto;">
+          <div id="student_table" style="position: absolute; top: 0; bottom: 0; left: 2%; right: 2%; overflow: auto;">
+            <table class="ui compact selectable striped celled table">
+
+              <!-- Students Table Head -->
+              <thead>
+                <tr>
+                  <th>Roll</th>
+                  <th>Name</th>
+                  <th class="center aligned">Sessions Attended</th>
+                  <th class="center aligned">Percentage</th>
+                </tr>
+              </thead>
+
+              <!-- Students Table Body -->
+              <tbody>
+                {% if student_roll|length == 0 %}
+                <tr>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">-</td>
+                </tr>
+                {% endif %}
+                {% for i in range(student_roll|length) %}
+                <tr>
+                  <td>{{student_roll[i]}}</td>
+                  <td>{{student_name[i]}}</td>
+                  <td class="center aligned">{{student_att_count[i]}}</td>
+                  <td class="center aligned">{{student_att_perc[i]}}%</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+
+            </table>
+
+          </div>
+        </div> <!-- .content -->
+
+      </div> <!-- .card -->
+    </div> <!-- .six .wide .column -->
+
+    <!-- Course Statistics Download Panel -->
+    <div class="four wide column" style="display: flex; flex-flow: column; align-items: stretch;">
+      <div class="ui card fluid" style="flex: auto;">
+
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Download CSV
+          </div>
+        </div>
+
+        <div class="content" style="position: relative; flex: auto;">
+          <div id="csv_button_container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -100%);">
+            {% if student_roll|length == 0 %}
+            <button class="ui fluid small green labeled icon button" id="download_records_csv_bt" disabled>
+            {% else %}
+            <button class="ui fluid small green labeled icon button" id="download_records_csv_bt">
+            {% endif %}
+              Download Attendance Records
+              <i class="chart bar outline icon"></i>
+            </button>
+          </div>
+        </div>
+
+      </div> <!-- .card -->
+    </div> <!-- .four .wide .column -->
+
+  </div> <!-- .grid -->
+
+</div>

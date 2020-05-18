@@ -5,9 +5,13 @@ Created on Sun Feb 23 00:03:35 2020
 @author: AdilDSW
 """
 
-import pymongo
+# Standard Built-in Libraries
 from bcrypt import hashpw, gensalt
 
+# 3rd-party Libraries
+import pymongo
+
+# Local Modules
 from utils import status_code
 
 class PresentDatabaseInterface:
@@ -22,7 +26,7 @@ class PresentDatabaseInterface:
                 },
             'departments': {
                 'columns': ["dept_name", "dept_code"],
-                'constraints': ["un", "un"],
+                'constraints': ["un", "n"],
                 'foreign_keys': ["", ""],
                 'map': ["", ""]
                 },
@@ -70,6 +74,9 @@ class PresentDatabaseInterface:
                 'map': ["", "session_code", "", "student_roll", ""]
                 }
             }
+        
+        self.doc_names = ['details', 'departments', 'faculties', 'classes', 
+                          'students', 'courses', 'sessions', 'attendance_logs']
         
         self.client = None
     
@@ -193,6 +200,57 @@ class PresentDatabaseInterface:
             message = status_code[status]
             return {'status': status, 'message': message, 
                     'fail_data': fail_data}
+        
+    def delete_data(self, doc_name, query={}):
+        """Deletes record from database.
+        
+        NOTE: THIS FUNCTION IS IN ALPHA STAGE, USE ONLY FOR REMOVING ATTENDANCE
+        """
+        try:
+            if not query:
+                status = "E1"
+            else:
+                flag = 0
+                docs = self.doc_names.copy()
+                if doc_name not in docs:
+                    status = "E0"
+                else:
+                    docs.remove(doc_name)
+                    query_res = self.fetch_data(doc_name, query)
+                    
+                    primary_col = ""
+                    for idx in range(
+                            len(self.db_key[doc_name]['constraints'])):
+                        if 'u' in self.db_key[doc_name]['constraints'][idx]:
+                            primary_col = self.db_key[doc_name]['columns'][idx]
+                            break
+                    primary_data = query_res['data'][0][primary_col]
+                        
+                    for doc in docs:
+                        maps = self.db_key[doc]['map']
+                        if primary_col in maps:
+                            map_idx = maps.index(primary_col)
+                            data_res = self.fetch_data(doc)
+                            data = data_res['data']
+                            for d in data:
+                                if d[primary_col] == primary_data:
+                                    flag = flag + 1
+                                    break
+                            if flag > 0:
+                                break
+                    
+                    if flag > 0:
+                        status = "E15"
+                    else:
+                        query = {primary_col: primary_data}
+                        self.present_db[doc_name].delete_one(query)
+                        status = "S0"
+        except Exception as e:
+            status = "E9"
+            print("ERROR: {}".format(str(e)))
+        finally:
+            message = status_code[status]
+            return {'status': status, 'message': message}
     
     ###########################
     # Constraints Check
@@ -397,7 +455,7 @@ if __name__ == "__main__":
     # query = {'dept_name': 'Information Technology'}
     # print(pdi.get_data_from_id("faculties", "5ea56d7edcfd2030c4ef46d4"))
     # print(pdi.fetch_data("departments", {'dept_code': "IT"}))
-    pdi.present_db["sessions"].update_many({'op_faculty_code': "UKD"}, {'$set': {'session_status': "Active"}})
+    # pdi.present_db["sessions"].update_many({'op_faculty_code': "UKD"}, {'$set': {'session_status': "Active"}})
     
     # doc_name = "departments"
     # data = {'dept_name': 1, 'dept_code': "IT"}

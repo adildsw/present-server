@@ -7,6 +7,7 @@ Created on Fri Feb 21 23:21:37 2020
 # Standard Built-in Libraries
 import csv
 import math
+from time import mktime
 from datetime import timedelta, datetime
 from bcrypt import checkpw
 
@@ -126,7 +127,7 @@ def configure_db_page():
 def register_org_page():
     """Organization Registration Page"""
     org_name = get_org_name()
-    if org_name:
+    if org_name != "None":
         return redirect(url_for("home"))
     else:
         return render_template("loader.html", server_code=1, org_name=org_name)
@@ -178,6 +179,7 @@ def load():
             db_con = pdi.check_db_connection()
             if db_con['connected']:
                 if is_org_registered():
+                    print(is_org_registered())
                     if session['username']:
                         server_code = 4
                     else:
@@ -403,6 +405,195 @@ def faculty_dash():
                                    course_name=course_name,
                                    faculty_code=op_faculty_code,
                                    class_code=class_code, date=date)
+        elif nav == "fac_session":
+            faculty_code = session['username']
+            date = []
+            time = []
+            session_code = []
+            attending_students_roll = []
+            attending_students_name = []
+            absent_students_roll = []
+            absent_students_name = []
+            
+            course_res = get_course_list(faculty_code)
+            course_code = course_res['course_code']
+            course_name = course_res['course_name']
+            faculty_codes = course_res['faculty_code']
+            class_codes = course_res['class_code']
+            course_status = course_res['course_status']
+            course_info = course_res['course_info']
+            
+            course_desc = ["{} | {} | {}".format(course_code[i], 
+                                                 course_name[i], 
+                                                 class_codes[i]) 
+                           for i in range(len(course_code))]
+            
+            selected_course_info = request.values.get("course_info")
+            
+            if selected_course_info:
+                session_res = get_session_list(selected_course_info, 
+                                               faculty_code)
+                session_code = session_res['session_code']
+                timestamp = session_res['timestamp']
+                datetimeval = [datetime.fromtimestamp(ts)
+                               .strftime('%d/%m/%Y %I:%M%p') 
+                               for ts in timestamp]
+                
+                date = [date.split(" ")[0] for date in datetimeval]
+                time = [date.split(" ")[1] for date in datetimeval]
+            
+            selected_session_code = request.values.get("session_code")
+            
+            if selected_session_code:
+                at_students_res = get_attending_students(selected_session_code)
+                attending_students_roll = at_students_res['student_roll']
+                attending_students_name = at_students_res['student_name']
+                
+                class_codes = selected_course_info.split("|")[3].split(", ")
+                total_students_roll = []
+                total_students_name = []
+                for class_code in class_codes:
+                    total_students_res = get_student_list(class_code)
+                    total_students_roll = (total_students_roll + 
+                                           total_students_res['student_roll'])
+                    total_students_name = (total_students_name + 
+                                           total_students_res['student_name'])
+                
+                absent_students_roll = [roll for roll in total_students_roll 
+                                        if roll not in attending_students_roll]
+                absent_students_name = [name for name in total_students_name 
+                                        if name not in attending_students_name]
+            
+            return render_template("/facultydash/fac_session.html", 
+                                   course_desc=course_desc, 
+                                   course_info=course_info, 
+                                   selected_course_info=selected_course_info,
+                                   date=date, time=time, 
+                                   session_code=session_code,
+                                   att_students_roll=attending_students_roll,
+                                   att_students_name=attending_students_name,
+                                   abs_students_roll=absent_students_roll,
+                                   abs_students_name=absent_students_name,
+                                   selected_session_code=selected_session_code)
+        elif nav == "fac_statistics":
+            faculty_code = session['username']
+            session_len = 0
+            student_len = 0
+            from_date_val = ""
+            to_date_val = ""
+            session_code = []
+            total_students_roll = []
+            total_students_name = []
+            total_students_att_count = []
+            total_students_att_perc = []
+            
+            course_res = get_course_list(faculty_code)
+            course_code = course_res['course_code']
+            course_name = course_res['course_name']
+            faculty_codes = course_res['faculty_code']
+            class_codes = course_res['class_code']
+            course_status = course_res['course_status']
+            course_info = course_res['course_info']
+            
+            course_desc = ["{} | {} | {}".format(course_code[i], 
+                                                 course_name[i], 
+                                                 class_codes[i]) 
+                           for i in range(len(course_code))]
+            
+            selected_course_info = request.values.get("course_info")
+            from_date_val = request.values.get("from_date")
+            to_date_val = request.values.get("to_date")
+            
+            from_date_val = from_date_val if from_date_val else ""
+            to_date_val = to_date_val if to_date_val else ""
+            
+            # Extracting Timestamp from From/To Date Values
+            try:
+                from_timestamp = mktime(datetime.strptime(from_date_val, 
+                                                       "%d/%m/%Y").timetuple())
+            except:
+                from_timestamp = 0
+            try:
+                to_timestamp = mktime(datetime.strptime(to_date_val, 
+                                                     "%d/%m/%Y").timetuple())
+            except:
+                to_timestamp = math.inf
+            
+            
+            if selected_course_info:
+                session_res = get_session_list(selected_course_info, 
+                                               faculty_code)
+                session_code = session_res['session_code']
+                
+                timestamp = session_res['timestamp']
+                
+                class_codes = selected_course_info.split("|")[3].split(", ")
+                for class_code in class_codes:
+                    total_students_res = get_student_list(class_code)
+                    total_students_roll = (total_students_roll + 
+                                           total_students_res['student_roll'])
+                    total_students_name = (total_students_name + 
+                                           total_students_res['student_name'])
+                
+                attendance_data = [[total_students_roll[i], 
+                                    total_students_name[i]] for i in range(
+                                        len(total_students_roll))]
+                attendance_head = ["Roll", "Name"]
+                total_students_att_count = [0 for i in total_students_roll]
+                
+                pop_list = []
+                for idx in range(len(timestamp)):
+                    ts = int(timestamp[idx])
+                    if ts < from_timestamp or ts > to_timestamp:
+                        pop_list.append(idx)
+                
+                pop_list.reverse()
+                for idx in pop_list:
+                    timestamp.pop(idx)
+                    session_code.pop(idx)
+                    
+                session_len = len(session_code)
+                student_len = len(total_students_roll)
+                
+                for idx, code in enumerate(session_code):
+                    dt = datetime.fromtimestamp(timestamp[idx]).strftime(
+                        '%d/%m/%Y')
+                    attendance_head.append(dt)
+                    
+                    at_students_res = get_attending_students(code)
+                    at_students_roll = at_students_res['student_roll']
+                    
+                    for i, roll in enumerate(total_students_roll):
+                        if roll in at_students_roll:
+                            total_students_att_count[i] += 1
+                            attendance_data[i].append(
+                                total_students_att_count[i])
+                        else:
+                            attendance_data[i].append("A")
+                
+                total_students_att_perc = [round(count*100/session_len, 2)
+                                           for count in 
+                                           total_students_att_count]
+                
+                csv_filename = "web/attendance_record.csv"
+                with open(csv_filename, 'w') as file:
+                    csvwriter = csv.writer(file)
+                    csvwriter.writerow(attendance_head)
+                    csvwriter.writerows(attendance_data)
+                
+            
+            return render_template("/facultydash/fac_course_stats.html",
+                                   course_info=course_info, 
+                                   course_desc=course_desc,
+                                   selected_course_info=selected_course_info,
+                                   session_len=session_len,
+                                   student_len=student_len,
+                                   from_date_val=from_date_val,
+                                   to_date_val=to_date_val,
+                                   student_roll=total_students_roll,
+                                   student_name=total_students_name,
+                                   student_att_count=total_students_att_count,
+                                   student_att_perc=total_students_att_perc)
         else:
             return "ERROR: Incorrect Service Call"
     else:
@@ -420,11 +611,17 @@ def gen_qr_img():
         return "ERROR: Insufficient Privilege"
 
 
-@app.route("/gen_qr_timestamp", methods=['POST'])
-def gen_qr_timestamp():
-    """App route for generating the QR Code timestamp for attendance session."""
+@app.route("/gen_qr_id", methods=['POST'])
+def gen_qr_id():
+    """App route for generating the QR Code ID for attendance session."""
     if session['username'] and session['username'] != "admin":
-        qr_timestamp = request.values.get('qr_timestamp')
+        # qr_timestamp = request.values.get('qr_timestamp')
+        qrcode_id = request.values.get("qrcode_id").split("_")
+        qr_session = ""
+        qr_timestamp = ""
+        if len(qrcode_id) == 3:
+            qr_session = qrcode_id[1]
+            qr_timestamp = qrcode_id[2]
         new_timestamp = ""
         
         if qr_timestamp == "":
@@ -437,12 +634,14 @@ def gen_qr_timestamp():
                 new_timestamp = timestamp + 5 # Adding a 5 second validity
             else:
                 new_timestamp = old_timestamp
+        
+        new_qrcode_id = "present_{}_{}".format(qr_session, new_timestamp)
                 
         return {'status': "S0", 'message': status_code['S0'], 
-                'qr_timestamp': new_timestamp}
+                'qrcode_id': new_qrcode_id}
     else:
         return {'status': "E8", 'message': status_code['S0'], 
-                'qr_timestamp': new_timestamp}
+                'qrcode_id': ""}
 
 
 @app.route("/terminate_attendance_session", methods=['POST'])
@@ -471,14 +670,20 @@ def share_attendance_controls():
             student_name = student_res['student_name']
             class_code = student_res['class_code']
             if class_code in class_codes:
-                query = {'session_code': session_code}
-                mod_query = {'control_share': student_roll}
-                res = pdi.update_data("sessions", query, mod_query)
-                status = res['status']
-                if status == "S0" and not has_attended(student_roll, session_code):
-                    res = give_attendance("faculty", session_code, 
-                                          {'student_roll': student_roll})
+                session_res = get_session_list()
+                control_share_list = session_res['control_share']
+                if student_roll not in control_share_list:
+                    query = {'session_code': session_code}
+                    mod_query = {'control_share': student_roll}
+                    res = pdi.update_data("sessions", query, mod_query)
                     status = res['status']
+                    if status == "S0" and not has_attended(student_roll, session_code):
+                        res = give_attendance("faculty", 
+                                              {'student_roll': student_roll, 
+                                               'session_code': session_code})
+                        status = res['status']
+                else:
+                    status = "E12"
             else:
                 status = "E10"
         else:
@@ -520,27 +725,33 @@ def attending_students_list():
 
 
 @app.route("/give_attendance", methods=['POST'])
-def set_attendance():
-    """App route for giving attendance to students."""
+def register_attendance_by_faculty():
+    """App route for giving attendance to students by the faculty."""
     if session['username'] and session['username'] != "admin":
         student_roll = request.values.get('student_roll')
-        class_codes = request.values.get('class_codes').split(" | ")
         session_code = request.values.get('session_code')
         
-        student_res = get_student_info(student_roll=student_roll)
-        if student_res['status'] == "S0":
-            class_code = student_res['class_code']
-            if class_code in class_codes:
-                if not has_attended(student_roll, session_code):
-                    res = give_attendance("faculty", session_code, 
-                                          {'student_roll': student_roll})
-                    status = res['status']
-                else:
-                    status = "S4"
-            else:
-                status = "E10"
-        else:
-            status = student_res['status']
+        params = {'student_roll': student_roll, 'session_code': session_code}
+        res = give_attendance("faculty", params)
+        
+        status = res['status']
+    else:
+        status = "E8"
+        
+    return {'status': status, 'message': status_code[status]}
+
+
+@app.route("/remove_attendance", methods=['POST'])
+def remove_attendance_by_faculty():
+    """App route for removing attendance of a student by the faculty."""
+    if session['username'] and session['username'] != "admin":
+        student_roll = request.values.get('student_roll')
+        session_code = request.values.get('session_code')
+        
+        query = {'student_roll': student_roll, 'session_code': session_code}
+        res = pdi.delete_data("attendance_logs", query)
+        
+        status = res['status']
     else:
         status = "E8"
         
@@ -951,16 +1162,26 @@ def register_device_api():
     if request.is_json:
         device_uid = request.json['device_uid']
         student_roll = request.json['student_roll']
+        mode = request.json['mode']
     else:
         device_uid = request.values.get("device_uid")
         student_roll = request.values.get("student_roll")
-    register_res = register_device(device_uid, student_roll)
+        mode = request.values.get("mode")
+    
+    if not mode:
+        mode = "CHECK"
+    register_res = register_device(device_uid, student_roll, mode)
+    
+    class_code = register_res['class_code']
+    class_code_res = resolve_class_code(class_code)
+    for key, value in class_code_res.items():
+        register_res[key] = value
     
     return register_res
 
 
 @app.route("/device_info", methods=['POST', 'GET'])
-def device_info():
+def device_info_api():
     """API for getting user info against registered device."""
     if request.is_json:
         device_uid = request.json['device_uid']
@@ -968,8 +1189,40 @@ def device_info():
         device_uid = request.values.get("device_uid")
     student_res = get_student_info(device_uid=device_uid)
     
-    return student_res
+    class_code = student_res['class_code']
+    class_code_res = resolve_class_code(class_code)
+    for key, value in class_code_res.items():
+        student_res[key] = value
     
+    return student_res
+
+
+@app.route("/request_attendance", methods=['POST'])
+def set_attendance_by_student_api():
+    """API for requesting attendance from registered device by students."""
+    if request.is_json:
+        device_uid = request.json['device_uid']
+        qrcode_id = request.json['qrcode_id']
+    else:
+        device_uid = request.values.get("device_uid")
+        qrcode_id = request.values.get("qrcode_id")
+    
+    params = {'device_uid': device_uid, 'qrcode_id': qrcode_id}
+    res = give_attendance("qrscan", params)
+    
+    return res
+
+
+@app.route("/request_host_controls", methods=['POST'])
+def request_host_controls_api():
+    """API for requesting host controls."""
+    if request.is_json:
+        device_uid = request.json['device_uid']
+    else:
+        device_uid = request.values.get("device_uid")
+    
+    res = get_host_controls(device_uid)
+    return res
 
 """
 |-----------------------------------------------------------------------------
@@ -1015,38 +1268,62 @@ def end_session(session_code):
     return {'status': res['status'], 'message': res['message']}
 
 
-def give_attendance(mode, session_code, params):
+def give_attendance(mode, params):
     """Gives attendance to student for the given session_code based on two 
-    modes - 1. Attendance given by professor, in which case the params required
-    is student_roll and class_codes of the session; 2. Attendance through QR 
-    Code scanning, in which case the params required is device_uid.
+    modes - 1. Attendance given by professor, in which case the param required
+    is student_roll; 2. Attendance through QR Code scanning, in which case the 
+    params required are device_uid and qrcode_id.
     """
+    status = ""
     student_roll = ""
     class_code = ""
+    course_code = ""
+    course_name = ""
     
     if mode == "faculty":
         student_roll = params['student_roll']
+        session_code = params['session_code']
         student_res = get_student_info(student_roll=student_roll)
         class_code = student_res['class_code']
     elif mode == "qrscan":
         device_uid = params['device_uid']
-        student_res = get_student_info(device_uid=device_uid)
-        student_roll = student_res['student_roll']
-        class_code = student_res['class_code']
-    
-    if student_roll and class_code:
-        session_res = get_session_info(session_code)
-        course_info = session_res['course_info']
-        class_codes = course_info.split("|")[3]
-        if class_code in class_codes:
-            if not has_attended(student_roll, session_code):
-                status = "S0"
-            else:
-                status = "S4"
+        qrcode_id = params['qrcode_id'].split("_")
+        if len(qrcode_id) != 3:
+            status = "E14"
+        elif qrcode_id[0] != "present":
+            status = "E14"
         else:
-            status = "E10"
-    else:
-        status = "E0"
+            timestamp = int(qrcode_id[2])
+            session_code = qrcode_id[1]
+            student_res = get_student_info(device_uid=device_uid)
+            student_roll = student_res['student_roll']
+            class_code = student_res['class_code']
+        
+            current_timestamp = math.floor(datetime.now().timestamp())
+            time_delta = timestamp - current_timestamp
+            
+            if time_delta > 8 or time_delta < 0:
+                status = "E13"
+    
+    if status != "E13" and status != "E14":
+        if student_res['status'] == "S0":
+            if student_roll and class_code and session_code:
+                session_res = get_session_info(session_code)
+                course_info = session_res['course_info']
+                course_code = course_info.split("|")[0]
+                course_name = course_info.split("|")[1]
+                class_codes = course_info.split("|")[3]
+                if class_code in class_codes:
+                    if not has_attended(student_roll, session_code):
+                        status = "S0"
+                    else:
+                        status = "S4"
+                else:
+                    status = "E10"
+            else:
+                status = "E0"
+        else:
+            status = student_res['status']
     
     if status == "S0":
         log_code = "{}_{}".format(session_code, student_roll)
@@ -1057,7 +1334,8 @@ def give_attendance(mode, session_code, params):
         res = pdi.insert_data("attendance_logs", data)
         status = res['status']
     
-    return {'status': status, 'message': status_code[status]}
+    return {'status': status, 'message': status_code[status], 
+            'course_code': course_code, 'course_name': course_name}
         
 def get_dept_list():
     """Returns department list from the database."""
@@ -1166,6 +1444,7 @@ def get_student_info(student_roll="", device_uid=""):
         if res['status'] == "S0":
             student_res = res['data'][0]
             student_name = student_res['student_name']
+            student_roll = student_res['student_roll']
             class_code = student_res['class_code']
             device_uid = student_res['device_uid']
     
@@ -1224,6 +1503,7 @@ def get_session_list(course_info="", op_faculty_code="", session_status=""):
     timestamp = []
     session_status_res = []
     course_info_res = []
+    control_share = []
     
     query = {}
     if course_info:
@@ -1241,11 +1521,12 @@ def get_session_list(course_info="", op_faculty_code="", session_status=""):
             timestamp.append(item['timestamp'])
             session_status_res.append(item['session_status'])
             course_info_res.append(item['course_info'])
+            control_share.append(item['control_share'])
     
     return {'status': res['status'], 'message': res['message'],
             'session_code': session_code, 'timestamp': timestamp, 
             'session_status': session_status_res, 
-            'course_info': course_info_res}
+            'course_info': course_info_res, 'control_share': control_share}
 
 
 def get_session_info(session_code):
@@ -1275,14 +1556,14 @@ def has_attended(student_roll, session_code):
     query = {'student_roll': student_roll, 'session_code': session_code}
     res = pdi.fetch_data("attendance_logs", query)
     if res['status'] == "S0":
-        if len(res['data']) == 1:
+        if len(res['data']) != 0:
             return True
     return False
 
 
 def get_attendance_control_info(session_code):
     """Returns the student_roll of the student with whom the attendance control
-    is shared, else returns None."""
+    is shared for the given session_code, else returns None."""
     if not session_code:
         return None
     query = {'session_code': session_code}
@@ -1294,6 +1575,46 @@ def get_attendance_control_info(session_code):
             student_name = student_res['student_name']
             return "{} | {}".format(student_name, student_roll)
     return None
+
+
+def get_host_controls(device_uid):
+    """Returns the QRCode ID and Session Info if device_uid has attendance
+    control privilege, returns error message otherwise."""
+    course_code = ""
+    course_name = ""
+    op_faculty_code = ""
+    date = ""
+    qrcode_id = ""
+    
+    student_res = get_student_info(device_uid=device_uid)
+    student_roll = student_res['student_roll']
+    
+    query = {'control_share': student_roll}
+    res = pdi.fetch_data("sessions", query)
+    
+    if res['status'] == "S0":
+        data = res['data'][0]
+        session_code = data['session_code']
+        session_status = data['session_status']
+        if session_status == "Active":
+            course_info = data['course_info'].split("|")
+            course_timestamp = int(data['timestamp'])
+            
+            course_code = course_info[0]
+            course_name = course_info[1]
+            op_faculty_code = data['op_faculty_code']
+            date = datetime.utcfromtimestamp(course_timestamp).strftime('%d/%m/%Y')
+            
+            timestamp = math.floor(datetime.now().timestamp()) + 5
+            qrcode_id = "present_{}_{}".format(session_code, timestamp)
+        else:
+            res['status'] = "S1"
+            res['message'] = status_code['S1']
+    
+    return {'status': res['status'], 'message': res['message'], 
+            'course_code': course_code, 'course_name': course_name, 
+            'op_faculty_code': op_faculty_code, 'date': date, 
+            'qrcode_id': qrcode_id}
 
 
 def get_attending_students(session_code):
@@ -1349,9 +1670,15 @@ def get_faculty_pwd(user):
         return None
 
 
-def register_device(device_uid, student_roll):
+def register_device(device_uid, student_roll, mode="CHECK"):
     """Registers the given device_uid against the given student_roll if the
-    student_roll isn't already linked to another device."""
+    student_roll isn't already linked to another device.
+    
+    Argument 'mode' can hold two values "CHECK" and "REGISTER". If 'mode' is
+    "CHECK", then the registration constraints are checked and the status is
+    returned, without actually registering the device. If 'mode' is "REGISTER",
+    then the device gets registered and the status is returned.
+    """
     status = "E9"
     student_name = ""
     class_code = ""
@@ -1360,31 +1687,52 @@ def register_device(device_uid, student_roll):
         status = "S5"
     else:
         res = get_student_info(student_roll=student_roll)
+        status = res['status']
         if res['status'] == "S0":
             if res['device_uid']:
                 status = "E11"
             else:
                 student_name = res['student_name']
                 class_code = res['class_code']
-                query = {'student_roll': student_roll}
-                mod_query = {'device_uid': device_uid}
-                update_res = pdi.update_data("students", query, mod_query)
-                status = update_res['status']
+                if mode == "REGISTER":
+                    query = {'student_roll': student_roll}
+                    mod_query = {'device_uid': device_uid}
+                    update_res = pdi.update_data("students", query, mod_query)
+                    status = update_res['status']
         else:
             status = res['status']
     
     return {'status': status, 'message': status_code[status], 
             'student_name': student_name, 'student_roll': student_roll, 
             'class_code': class_code, 'device_uid': device_uid}
+
             
-    
-    
 def is_org_registered():
     """Returns true if organization is registered, false otherwise."""
-    if get_org_name():
+    if get_org_name() != "None":
         return True
     else:
         return False
+
+
+def resolve_class_code(class_code):
+    """Resolves class_code of the format DEPTCODE_STARTYEAR_GRADYEAR_SECTION 
+    into individual components and returns them."""
+    class_code_components = class_code.split("_")
+    dept_code = class_code_components[0] if class_code else ""
+    start_year = class_code_components[1] if class_code else ""
+    grad_year = class_code_components[2] if class_code else ""
+    section = class_code_components[3] if class_code else ""
+    
+    dept_name = ""
+    dept_res = get_dept_list()
+    dept_name_res = dept_res['dept_name']
+    if dept_code in dept_res['dept_code']:
+        dept_name = dept_name_res[dept_res['dept_code'].index(dept_code)]
+    
+    return {'dept_code': dept_code, 'dept_name': dept_name, 
+            'start_year': start_year, 'grad_year': grad_year, 
+            'section': section, 'class_code': class_code}
 
 
 # Host Configuration and Server Execution

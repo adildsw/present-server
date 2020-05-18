@@ -50,10 +50,29 @@ $(document).ready(function() {
 
   /*
   |---------------------------------------------------------------------------
+  | Faculty Dashboard: Courses
+  |---------------------------------------------------------------------------
+  |
+  | This section contains functionalities related to the "Courses"
+  | section in the administrator navigation sidebar.
+  |
+  */
+
+
+  // Start Session Button Click Event
+  $("#content").on("click", ".session_bt", function() {
+    var course_info = $(this).val()
+    var params = "".concat("navigation=start_session&course_info=", course_info)
+    $.fn.facultyNav(params);
+  });
+
+
+  /*
+  |---------------------------------------------------------------------------
   | Faculty Dashboard: Attendance Session
   |---------------------------------------------------------------------------
   |
-  | This section contains functionalities related to the "Manage Departments"
+  | This section contains functionalities related to the Attendance Session
   | section in the administrator navigation sidebar.
   |
   */
@@ -107,11 +126,9 @@ $(document).ready(function() {
   $("#content").on("click", "#give_attendance_bt", function() {
     var url = "/give_attendance"
     var student_roll = $('input[name="attendance_student_roll"]').val();
-    var class_codes = $("#class_code_div").text().trim();
     var session_code = $('input[name="session_code"]').val();
     var params = "".concat(
       "student_roll=", student_roll,
-      "&class_codes=", class_codes,
       "&session_code=", session_code
     );
     var callback = function(responseText) {
@@ -150,19 +167,21 @@ $(document).ready(function() {
 
   // Function to load QRCode Image
   $.fn.getQR = function() {
-    var url = "/gen_qr_timestamp";
+    var url = "/gen_qr_id";
     var session_code = $('input[name="session_code"]').val();
-    var qr_timestamp = $('input[name="qr_timestamp"]').val();
-    var params = "".concat("qr_timestamp=", qr_timestamp);
+    var qrcode_id = $('input[name="qrcode_id"]').val();
+    if(qrcode_id == "") {
+      qrcode_id = "present_".concat(session_code, "_");
+    }
+    var params = "".concat("qrcode_id=", qrcode_id);
 
     var callback = function(responseText) {
       var res = JSON.parse(responseText);
       if(res['status'] == "S0") {
-        qr_timestamp = res['qr_timestamp'];
-        $('input[name="qr_timestamp"]').val(qr_timestamp);
+        qrcode_id = res['qrcode_id'];
+        $('input[name="qrcode_id"]').val(qrcode_id);
 
         var url1 = "/gen_qr_img";
-        var qrcode_id = "".concat(session_code, "_", qr_timestamp);
         var params1 = {'qrcode_id': qrcode_id}
         $("#qr_code_div").load(url1, params1); // Loading QR Image
       }
@@ -170,6 +189,133 @@ $(document).ready(function() {
 
     $.fn.postRequest(url, params, callback); // Obtaining QR Code ID
   }
+
+
+  /*
+  |---------------------------------------------------------------------------
+  | Faculty Dashboard: Manage Sessions
+  |---------------------------------------------------------------------------
+  |
+  | This section contains functionalities related to the "Manage Sessions"
+  | section in the administrator navigation sidebar.
+  |
+  */
+
+
+  // Load Session Table after Selecting Course
+  $("#content").on("change", "#manage_session_course_code", function() {
+    var course_info = $(this).val();
+    var params = "".concat("navigation=fac_session&course_info=", course_info);
+    $.fn.facultyNav(params);
+  })
+
+
+  // Load Course Details
+  $("#content").on("click", ".load_course_details_bt", function() {
+    var course_info = $("input[name='selected_course_info']").val();
+    var session_code = $(this).val();
+    var params = "".concat("navigation=fac_session&course_info=", course_info,
+                            "&session_code=", session_code);
+    $.fn.facultyNav(params);
+  })
+
+
+  // Give Attendance
+  $("#content").on("click", ".mark_present_bt", function() {
+    var url = "/give_attendance";
+    var course_info = $("input[name='selected_course_info']").val();
+    var session_code = $("input[name='selected_session_code']").val();
+    var student_roll = $(this).val();
+    var params = "".concat(
+      "student_roll=", student_roll,
+      "&session_code=", session_code
+    );
+    var params_nav = "".concat(
+      "navigation=fac_session",
+      "&course_info=", course_info,
+      "&session_code=", session_code
+    );
+    var callback = function(responseText) {
+      var res = JSON.parse(responseText);
+      if(res['status'] != "S0") {
+        alert(res['message']);
+      }
+      else {
+        $.fn.facultyNav(params_nav);
+      }
+    };
+    $.fn.postRequest(url, params, callback);
+  })
+
+
+  // Remove Attendance
+  $("#content").on("click", ".mark_absent_bt", function() {
+    var url = "/remove_attendance";
+    var course_info = $("input[name='selected_course_info']").val();
+    var session_code = $("input[name='selected_session_code']").val();
+    var student_roll = $(this).val();
+    var params = "".concat(
+      "student_roll=", student_roll,
+      "&session_code=", session_code
+    );
+    var params_nav = "".concat(
+      "navigation=fac_session",
+      "&course_info=", course_info,
+      "&session_code=", session_code
+    );
+    var callback = function(responseText) {
+      var res = JSON.parse(responseText);
+      if(res['status'] != "S0") {
+        alert(res['message']);
+      }
+      else {
+        $.fn.facultyNav(params_nav);
+      }
+    };
+    $.fn.postRequest(url, params, callback);
+  })
+
+
+  /*
+  |---------------------------------------------------------------------------
+  | Faculty Dashboard: Course Statistics
+  |---------------------------------------------------------------------------
+  |
+  | This section contains functionalities related to the "Manage Sessions"
+  | section in the administrator navigation sidebar.
+  |
+  */
+
+
+  // Loads Selected Course Statistics
+  $("#content").on("change", "#course_statistics_course_code", function() {
+    var course_info = $(this).val();
+    var params = "".concat(
+      "navigation=fac_statistics&course_info=", course_info
+    );
+    $.fn.facultyNav(params);
+  })
+
+
+  // Applies Filter and Loads Course Statistics
+  $("#content").on("click", "#filter_results_bt", function() {
+    var course_info = $('input[name="selected_course_info_stats"]').val();
+    var from_date = $('input[name="from_date"]').val();
+    var to_date = $('input[name="to_date"]').val();
+    var params = "".concat(
+      "navigation=fac_statistics",
+      "&course_info=", course_info,
+      "&from_date=", from_date,
+      "&to_date=", to_date,
+    );
+    $.fn.facultyNav(params);
+  })
+
+
+  // Download Attendance Records
+  $("#content").on("click", "#download_records_csv_bt", function() {
+    window.location.href="attendance_record.csv";
+  })
 
 
   /*
@@ -183,14 +329,6 @@ $(document).ready(function() {
   */
 
 
-  // Start Session Button Click Event
-  $("#content").on("click", ".session_bt", function() {
-    var course_info = $(this).val()
-    var params = "".concat("navigation=start_session&course_info=", course_info)
-    $.fn.facultyNav(params);
-  });
-
-
   /*
   * Function for Navigating Faculty Dashboard using Sidebar
   *
@@ -202,9 +340,10 @@ $(document).ready(function() {
   *
   * <section> is variable for the different sections defined as follows:
   * "fac_course" => Course Section
-  * "fac_session" => Course Session Section
-  * "fac_statistics" => Course Statistics Section
-  * "start_session" => Start Session Section, takes additional course_info param
+  * "fac_session" => Course Session Section, also takes course_info
+                     and session_code params
+  * "fac_statistics" => Course Statistics Section, also takes course_info param
+  * "start_session" => Start Session Section, also takes course_info param
   *
   */
   $.fn.facultyNav = function(params) {

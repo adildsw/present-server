@@ -1,0 +1,207 @@
+<!-- Sessions Section -->
+<div class="ui teal segment">
+  <h2 class="ui header">
+    <i class="clock outline icon"></i>
+    <div class="content">
+      Manage Sessions
+    </div>
+  </h2>
+
+  <input type="hidden" name="selected_course_info" value="{{selected_course_info}}">
+  <input type="hidden" name="selected_session_code" value="{{selected_session_code}}">
+
+  <!-- Course and Session Selection Panel -->
+  <div class="ui grid" style="height:80vh;">
+    <div class="six wide column" style="display: flex; flex-flow: column; align-items: stretch;">
+
+      <div class="ui card fluid" style="flex: auto;">
+
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Select Course and Session
+          </div>
+        </div>
+
+        <!-- Course Selection Dropdown -->
+        <div class="content" style="flex: initial;">
+          <div class="ui form">
+            <div class="field">
+              <div class="ui labeled fluid input">
+                <div class="ui label">
+                  Course
+                </div>
+                <div class="ui fluid selection dropdown upward">
+                  <input type="hidden" name="manage_session_course_code" id="manage_session_course_code">
+                  <i class="dropdown icon"></i>
+                  <div class="default text">
+                    Course
+                  </div>
+                  <div class="menu">
+                    {% for i in range(course_info|length) %}
+                    {% if course_info[i] == selected_course_info %}
+                      <div class="item" data-value="">{{course_desc[i]}}</div>
+                    {% else %}
+                      <div class="item" data-value="{{course_info[i]}}">{{course_desc[i]}}</div>
+                    {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- .form -->
+        </div> <!-- .content -->
+
+        <!-- Session Table -->
+        <div class="content" style="position: relative; border: 0px; flex: auto;">
+          <div id="sessions_table_body" style="position: absolute; top: 0; bottom: 0; left: 2%; right: 2%; overflow: auto;">
+            <table class="ui compact selectable striped celled table">
+
+              <!-- Session Table Head -->
+              <thead>
+                <tr>
+                  <th class="center aligned">Date</th>
+                  <th class="center aligned">Time</th>
+                  <th class="six wide center aligned">Details</th>
+                </tr>
+              </thead>
+
+              <!-- Session Table Body -->
+              <tbody>
+                {% if session_code|length == 0 %}
+                <tr>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">
+                    <button class="ui button small primary session_bt" disabled>View</button>
+                  </td>
+                </tr>
+                {% endif %}
+                {% for i in range(date|length) %}
+                <tr>
+                  <td class="center aligned">{{date[i]}}</td>
+                  <td class="center aligned">{{time[i]}}</td>
+                  <td class="center aligned">
+                    <button class="ui button small primary load_course_details_bt" value="{{session_code[i]}}">View</button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+
+            </table>
+
+          </div>
+        </div> <!-- .content -->
+
+      </div> <!-- .card -->
+
+    </div> <!-- .five .wide .column -->
+
+    <!-- Participating Students Panel -->
+    <div class="five wide column" style="display: flex; flex-flow: column; align-items: stretch;">
+      <div class="ui card fluid" style="flex: auto;">
+
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Participating Students
+          </div>
+        </div>
+
+        <div class="content" style="position: relative; border: 0px; flex: auto;">
+          <div id="sessions_table_body" style="position: absolute; top: 0; bottom: 0; left: 2%; right: 2%; overflow: auto;">
+            <table class="ui compact selectable striped celled table">
+
+              <!-- Participating Students Table Head -->
+              <thead>
+                <tr>
+                  <th>Roll</th>
+                  <th>Name</th>
+                  <th class="six wide center aligned">Mark Absent</th>
+                </tr>
+              </thead>
+
+              <!-- Participating Students Table Body -->
+              <tbody>
+                {% if att_students_roll|length == 0 %}
+                <tr>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">
+                    <button class="ui button small red mark_abset_bt" disabled>Absent</button>
+                  </td>
+                </tr>
+                {% endif %}
+                {% for i in range(att_students_roll|length) %}
+                <tr>
+                  <td>{{att_students_roll[i]}}</td>
+                  <td>{{att_students_name[i]}}</td>
+                  <td class="center aligned">
+                    <button class="ui button small red mark_absent_bt" value="{{att_students_roll[i]}}">Absent</button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+
+            </table>
+
+          </div>
+        </div> <!-- .content -->
+
+      </div> <!-- .card -->
+    </div> <!-- .five .wide .column -->
+
+    <!-- Absent Students Panel -->
+    <div class="five wide column" style="display: flex; flex-flow: column; align-items: stretch;">
+      <div class="ui card fluid" style="flex: auto;">
+
+        <div class="content" style="flex: initial;">
+          <div class="header">
+            Absent Students
+          </div>
+        </div>
+
+        <div class="content" style="position: relative; border: 0px; flex: auto;">
+          <div id="sessions_table_body" style="position: absolute; top: 0; bottom: 0; left: 2%; right: 2%; overflow: auto;">
+            <table class="ui compact selectable striped celled table">
+
+              <!-- Absent Students Table Head -->
+              <thead>
+                <tr>
+                  <th>Roll</th>
+                  <th>Name</th>
+                  <th class="six wide center aligned">Mark Present</th>
+                </tr>
+              </thead>
+
+              <!-- Absent Students Table Body -->
+              <tbody>
+                {% if abs_students_roll|length == 0 %}
+                <tr>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">-</td>
+                  <td class="center aligned">
+                    <button class="ui button small green mark_present_bt" disabled>Present</button>
+                  </td>
+                </tr>
+                {% endif %}
+                {% for i in range(abs_students_roll|length) %}
+                <tr>
+                  <td>{{abs_students_roll[i]}}</td>
+                  <td>{{abs_students_name[i]}}</td>
+                  <td class="center aligned">
+                    <button class="ui button small green mark_present_bt" value="{{abs_students_roll[i]}}">Present</button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+
+            </table>
+
+          </div>
+        </div> <!-- .content -->
+
+      </div> <!-- .card -->
+    </div> <!-- .five .wide .column -->
+
+  </div> <!-- .grid -->
+
+</div>
